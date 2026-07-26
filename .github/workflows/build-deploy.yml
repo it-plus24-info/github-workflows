@@ -9,6 +9,9 @@ on:
       kubero_app_path:
         required: true
         type: string
+      kubero_worker_path:
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -80,7 +83,17 @@ jobs:
 
       - name: Restart Kubero App
         run: |
-          curl --fail --request GET \
+          restart() {
+            local path="$1"
+            
+            curl --fail --request GET \
             --header "Content-Type: application/json" \
             --header "Authorization: Bearer ${{ steps.kubero-auth.outputs.token }}" \
-            "${{ secrets.KUBERO_ENDPOINT }}${{ inputs.kubero_app_path }}"
+            "${{ secrets.KUBERO_ENDPOINT }}${path}"
+          }
+
+          restart "${{ inputs.kubero_app_path }}"
+
+          if [[ -n "${{ inputs.kubero_worker_path }}" ]]; then
+            restart "${{ inputs.kubero_worker_path }}"
+          fi
