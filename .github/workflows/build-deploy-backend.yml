@@ -9,6 +9,15 @@ on:
       kubero_app_path:
         required: true
         type: string
+      kubero_domain_worker_path:
+        required: true
+        type: string
+      kubero_email_worker_path:
+        required: true
+        type: string
+      kubero_invoice_worker_path:
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -90,3 +99,9 @@ jobs:
           }
 
           restart "${{ inputs.kubero_app_path }}"
+
+          restart "${{ inputs.kubero_domain_worker_path }}"
+          
+          restart "${{ inputs.kubero_email_worker_path }}"
+          
+          restart "${{ inputs.kubero_invoice_worker_path }}"
