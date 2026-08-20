@@ -30,7 +30,7 @@ jobs:
       - id: vars
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo "image_tag=prod" >> "$GITHUB_OUTPUT"
+            echo "image_tag=latest" >> "$GITHUB_OUTPUT"
           else
             echo "image_tag=develop" >> "$GITHUB_OUTPUT"
           fi
@@ -51,6 +51,9 @@ jobs:
             ghcr.io/${{ inputs.image_name }}:${{ steps.vars.outputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            DEPLOYMENT_VERSION=${{ github.sha }}
+            NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
 
   deploy:
     needs: build-and-push

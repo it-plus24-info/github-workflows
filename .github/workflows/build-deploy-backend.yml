@@ -39,7 +39,7 @@ jobs:
       - id: vars
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo "image_tag=prod" >> "$GITHUB_OUTPUT"
+            echo "image_tag=latest" >> "$GITHUB_OUTPUT"
           else
             echo "image_tag=develop" >> "$GITHUB_OUTPUT"
           fi
