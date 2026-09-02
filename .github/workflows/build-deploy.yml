@@ -3,6 +3,9 @@ name: Build and Deploy
 on:
   workflow_call:
     inputs:
+      environment:
+        required: true
+        type: string
       image_name:
         required: true
         type: string
@@ -60,13 +63,18 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      name: ${{ inputs.environment }}
 
     steps:
+      - name: Debug deployment context
+        run: |
+          echo "environment=${{ inputs.environment }}"
+          echo "KUBERO_ENDPOINT=${{ secrets.KUBERO_ENDPOINT }}"
+
       - name: Authenticate with Kubero
         id: kubero-auth
         run: |
-          TOKEN=$(curl --silent --location \
+          TOKEN=$(curl --fail-with-body --show-error --silent --location \
             '${{ secrets.KUBERO_ENDPOINT }}/api/auth/login' \
             --header 'Content-Type: application/json' \
             --data '{
@@ -86,7 +94,7 @@ jobs:
           restart() {
             local path="$1"
             
-            curl --fail --request GET \
+            curl --fail-with-body --silent --show-error --request GET \
             --header "Content-Type: application/json" \
             --header "Authorization: Bearer ${{ steps.kubero-auth.outputs.token }}" \
             "${{ secrets.KUBERO_ENDPOINT }}${path}"
